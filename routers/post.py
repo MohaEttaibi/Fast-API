@@ -1,5 +1,5 @@
-from fastapi import APIRouter
-from models.post import UserPost, UserPostIn
+from fastapi import APIRouter, HTTPException
+from models.post import UserPost, UserPostIn, Comment, CommentIn, UserPostWithComments
 
 router = APIRouter()
 
@@ -8,8 +8,12 @@ router = APIRouter()
 #     return {"message": "Welcome To Fast API."}
 
 post_table = {}
+comment_table = {}
 
-@router.post("/post", response_model=UserPost)
+def find_post(post_id: int):
+    return post_table.get(post_id)
+
+@router.post("/post", response_model=UserPost, status_code=201)
 async def create_post(post: UserPostIn):
     data = post.dict()
     last_record_id = len(post_table)
@@ -20,3 +24,32 @@ async def create_post(post: UserPostIn):
 @router.get("/post", response_model=list[UserPost])
 async def get_all_post():
     return list(post_table.values())
+
+@router.post("/comment", response_model=Comment)
+async def create_comment(comment: CommentIn):
+    post = find_post(comment.post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post Not Found")
+    
+    data = comment.dict()
+    last_record_id = len(comment_table)
+    new_comment = {**data, "id": last_record_id}
+    comment_table[last_record_id] = new_comment
+    return new_comment
+
+@router.get("/post/{post_id}/comments", response_model=list[Comment])
+async def get_comment_on_post(post_id: int):
+    return [
+        comment for comment in comment_table.values() if comment["post_id"] == post_id # list comprehension
+    ]
+
+@router.get("/post/{post_id}", response_model=UserPostWithComments)
+async def get_post_on_comments(post_id: int):
+    post = find_post(post_id)
+    if not post:
+        raise HTTPException(status_code=404, detail="Post Not Found")
+    
+    return {
+        "post": post,
+        "comments": await get_comment_on_post(post_id)
+    }
