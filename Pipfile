@@ -10,6 +10,8 @@ uvicorn = {extras = ["standard"], version = "*"}
 ruff = "*"
 black = "*"
 isort = "*"
+pytest = "*"
+httpx = "*"
 
 [dev-packages]
 
