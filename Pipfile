@@ -12,6 +12,11 @@ black = "*"
 isort = "*"
 pytest = "*"
 httpx = "*"
+sqlalchemy = "*"
+aiosqlite = "*"
+python-dotenv = "*"
+pydantic--settings = "*"
+pydantic-settings = "*"
 
 [dev-packages]
 
