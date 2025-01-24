@@ -27,7 +27,7 @@ async def create_comment(comment: CommentIn):
         raise HTTPException(status_code=404, detail="Post Not Found")
     
     data = comment.dict()
-    query = comment.insert().values(data)
+    query = comment_table.insert().values(data)
     last_record_id = await database.execute(query)
     return {**data, "id": last_record_id}
 

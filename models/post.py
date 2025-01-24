@@ -16,8 +16,8 @@ class CommentIn(BaseModel):
 class Comment(CommentIn):
     id: int
 
-    class Config:
-        orm_mode = True
+    # class Config:
+    #     orm_mode = True
 
 class UserPostWithComments(BaseModel):
     post: UserPost
