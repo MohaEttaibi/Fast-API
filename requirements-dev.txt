@@ -8,3 +8,4 @@ databases[aiosqlite]
 databases[asyncpg]
 python-dotenv
 pydantic-settings
+rich

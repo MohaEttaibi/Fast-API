@@ -17,6 +17,7 @@ aiosqlite = "*"
 python-dotenv = "*"
 pydantic--settings = "*"
 pydantic-settings = "*"
+rich = "*"
 
 [dev-packages]
 

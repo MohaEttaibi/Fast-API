@@ -2,7 +2,10 @@
 *.pyc
 __pycache__
 .env
+.env.example
+.python-version
 *.db
 .venv
 .vscode/
 *.png
+*.txt
