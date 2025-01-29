@@ -18,6 +18,8 @@ python-dotenv = "*"
 pydantic--settings = "*"
 pydantic-settings = "*"
 rich = "*"
+asgi-correlation-id = "*"
+python-json-logger = "*"
 
 [dev-packages]
 
