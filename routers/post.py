@@ -39,6 +39,7 @@ async def create_comment(comment: CommentIn):
     
     data = comment.dict()
     query = comment_table.insert().values(data)
+    # logger.debug(query, extra={"email": "moha@gmail.com"})
     logger.debug(query)
     last_record_id = await database.execute(query)
     return {**data, "id": last_record_id}
