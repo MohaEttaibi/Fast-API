@@ -5,8 +5,8 @@ from functools import lru_cache
 
 class BaseConfig(BaseSettings):
     ENV_STATE: Optional[str]
-    # class Config:
-    #     env_file: str = ".env"
+    class Config:
+        env_file: str = ".env"
 
 class GlobalConfig(BaseSettings):
     DATABASE_URL: Optional[str] = None

@@ -1,8 +1,3 @@
-ruff
-black
-isort
-pytest
-httpx
 sqlalchmey
 databases[aiosqlite]
 databases[asyncpg]
@@ -12,3 +7,6 @@ rich
 asgi-correlation-id
 python-json-logger
 logtail-python
+python-jose
+python-multipart
+passlib[brcypt]

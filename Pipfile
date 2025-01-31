@@ -7,20 +7,26 @@ name = "pypi"
 fastapi = "*"
 mysql-connector-python = "*"
 uvicorn = {extras = ["standard"], version = "*"}
+sqlalchemy = "*"
+aiosqlite = "*"
+pydantic--settings = "*"
 ruff = "*"
 black = "*"
 isort = "*"
 pytest = "*"
 httpx = "*"
-sqlalchemy = "*"
-aiosqlite = "*"
+pytest-mock = "*"
+sqlalchmey = "*"
+databases = {extras = ["asyncpg"], version = "*"}
 python-dotenv = "*"
-pydantic--settings = "*"
 pydantic-settings = "*"
 rich = "*"
 asgi-correlation-id = "*"
 python-json-logger = "*"
 logtail-python = "*"
+python-jose = "*"
+python-multipart = "*"
+passlib = {extras = ["brcypt"], version = "*"}
 
 [dev-packages]
 

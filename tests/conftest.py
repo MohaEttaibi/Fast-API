@@ -4,10 +4,12 @@ from httpx import AsyncClient
 import pytest
 import os
 # from routers.post import comment_table, post_table
+# from routers.user import user_table
 
 os.environ["ENV_STATE"] = "test"
-from database import database #noeqa: E402
-from main import app #noeqa: E402
+
+from database import database, user_table  # noqa: E402
+from main import app  # noqa: E402
 
 @pytest.fixture(scope="session")
 def anyio_backend():
@@ -30,3 +32,12 @@ async def db() -> AsyncGenerator:
 async def async_client() -> AsyncGenerator:
     async with AsyncClient(base_url="http://127.0.0.1:8000") as ac:
         yield ac
+
+@pytest.fixture()
+async def registered_user(async_client: AsyncClient) -> dict:
+    user_details = {"email": "test@gmail.com", "password":"123456"}
+    await async_client.post("/register", json=user_details)
+    query = user_table.select().where(user_table.c.email == user_details["email"])
+    user = await database.fetch_one(query)
+    user_details["id"] = user.id
+    return user_details
