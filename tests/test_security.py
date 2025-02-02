@@ -1,5 +1,5 @@
 import pytest
-from security import security
+from store import security
 
 @pytest.mark.anyio
 async def test_get_user(registered_user: dict):
