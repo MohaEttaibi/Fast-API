@@ -5,6 +5,7 @@ class UserPostIn(BaseModel):
 
 class UserPost(UserPostIn):
     id: int
+    user_id: int
 
     class Config:
         # orm_mode = True
@@ -16,9 +17,11 @@ class CommentIn(BaseModel):
 
 class Comment(CommentIn):
     id: int
+    user_id: int
 
     class Config:
-        orm_mode = True
+        # orm_mode = True
+        from_attributes = True
 
 class UserPostWithComments(BaseModel):
     post: UserPost
