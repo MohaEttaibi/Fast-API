@@ -1,5 +1,5 @@
 from httpx import AsyncClient
-from store import security
+from security import security
 import pytest
 
 async def create_post(body: str, async_client: AsyncClient, logged_in_token: str) -> dict:
@@ -16,6 +16,14 @@ async def create_comment(body: str, post_id: int, async_client: AsyncClient, log
         "post_id": post_id}, 
         headers={"Authorization": f"Bearer {logged_in_token}"}
     )
+    return response.json()
+
+async def like_post(post_id: int, async_client: AsyncClient, logged_in_token: str) -> dict:
+    response = await async_client.post(
+        "/like", 
+        json={"post_id": post_id}, 
+        headers={"Authorization": f"Bearer {logged_in_token}"}
+    ),
     return response.json()
 
 @pytest.fixture()
@@ -42,9 +50,22 @@ async def test_create_post(async_client: AsyncClient,registered_user: dict, logg
     }.items() <= response.json().items()
 
 @pytest.mark.anyio
-async def test_create_post_missing_data(async_client: AsyncClient, logged_in_token):
-    response = await async_client.post("/post", json={}, headers={"Authorization": f"Bearer {logged_in_token}"})
+async def test_create_post_missing_data(async_client: AsyncClient, logged_in_token: str):
+    response = await async_client.post(
+        "/post", 
+        json={}, 
+        headers={"Authorization": f"Bearer {logged_in_token}"}
+    )
     assert response.status_code == 422
+
+@pytest.mark.anyio
+async def test_like_post(async_client: AsyncClient, craeted_post: dict, logged_in_token: str):
+    response = await async_client.post(
+        "/like", 
+        json={"post_id": create_post["id"]}, 
+        headers={"Authorization": f"Bearer {logged_in_token}"}
+    )
+    assert response.status_code == 201
 
 @pytest.mark.anyio
 async def test_create_post_expired_token(async_client: AsyncClient, registered_user: dict, mocker):
@@ -93,11 +114,11 @@ async def test_get_comments_on_post_empty(async_client: AsyncClient, created_pos
     assert response.json() == []
 
 @pytest.mark.anyio
-async def test_get_post_with_comment(async_client: AsyncClient, created_post: dict, created_comment: dict):
+async def test_get_post_with_comments(async_client: AsyncClient, created_post: dict, created_comment: dict):
     response = await async_client.get(f"/post/{created_post['id']}")
     assert response.status_code == 200
     assert response.json() == {
-        "post": created_post,
+        "post": {**created_post, "likes": 0},
         "commnets": [created_comment]
     }
 
