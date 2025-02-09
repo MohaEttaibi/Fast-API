@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Request, Depends
 from database import comment_table, post_table, database, like_table
 from models.post import UserPost, UserPostIn, Comment, CommentIn, UserPostWithComments, PostLikeIn, PostLike, UserPostWithLikes
 from models.user import User
-from security import get_current_user, oauth2_scheme
+from security import get_current_user # oauth2_scheme
 
 router = APIRouter()
 
