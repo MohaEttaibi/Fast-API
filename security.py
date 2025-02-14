@@ -25,11 +25,10 @@ def create_credentials_exception(detail: str) -> HTTPException:
 
 
 def access_token_expire_minutes() -> int:
-    return 30
-
+    return 30               # 30 minute
 
 def confirm_token_expire_minutes() -> int:
-    return 1440
+    return 1440             # 42 hours
 
 
 def create_access_token(email: str):
