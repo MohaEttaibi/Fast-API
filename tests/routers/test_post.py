@@ -1,5 +1,5 @@
 from httpx import AsyncClient
-from security import security
+from store import security
 import pytest
 
 async def create_post(body: str, async_client: AsyncClient, logged_in_token: str) -> dict:
@@ -116,7 +116,7 @@ async def test_get_all_posts_sort_likes(async_client: AsyncClient, logged_in_tok
     expected_order = [1, 2]
     assert post_ids == expected_order
 
-@pytest.maek.anyio
+@pytest.mark.anyio
 async def test_get_all_posts_wrong_sorting(async_client: AsyncClient):
     response = await async_client.get("/post", params={"sorting": "wrong"})
     assert response.status_code == 222

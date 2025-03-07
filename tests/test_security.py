@@ -1,6 +1,6 @@
 import pytest
 from jose import jwt
-from security import security
+from store import security
 
 def test_access_token_expire_minutes():
     assert security.access_token_expire_minutes() == 30
