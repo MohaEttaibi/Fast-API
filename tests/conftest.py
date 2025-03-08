@@ -30,12 +30,13 @@ async def db() -> AsyncGenerator:
 
 @pytest.fixture()
 async def async_client() -> AsyncGenerator:
+    # async with AsyncClient(base_url=client.base_url) as ac:
     async with AsyncClient(base_url="http://127.0.0.1:8000") as ac:
         yield ac
 
 @pytest.fixture()
 async def registered_user(async_client: AsyncClient) -> dict:
-    user_details = {"email": "test@gmail.com", "password":"123456"}
+    user_details = {"email": "test@example.net", "password": "1234"}
     await async_client.post("/register", json=user_details)
     query = user_table.select().where(user_table.c.email == user_details["email"])
     user = await database.fetch_one(query)
@@ -43,6 +44,17 @@ async def registered_user(async_client: AsyncClient) -> dict:
     return user_details
 
 @pytest.fixture()
-async def logged_in_token(async_client: AsyncClient, registered_user: dict) -> str:
-    response = await async_client.post("/token", json={registered_user})
+async def confirmed_user(registered_user: dict) -> dict:
+    query = (
+        user_table.update()
+        .where(user_table.c.email == registered_user["email"])
+        .values(confirmed=True)
+    )
+    await database.execute(query)
+    return registered_user
+
+@pytest.fixture()
+async def logged_in_token(async_client: AsyncClient, confirmed_user: dict) -> str:
+    response = await async_client.post("/token", json=confirmed_user)
     return response.json()["access_token"]
+    # return response.json().get("token")

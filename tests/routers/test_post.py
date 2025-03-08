@@ -35,7 +35,7 @@ async def created_comment(async_client: AsyncClient, logged_in_token: str):
     return await create_comment("Test Comment",create_post["id"], async_client, logged_in_token)
 
 @pytest.mark.anyio
-async def test_create_post(async_client: AsyncClient,registered_user: dict, logged_in_token: str):
+async def test_create_post(async_client: AsyncClient,confirmed_user: dict, logged_in_token: str):
     body = "Test Post"
     response = await async_client.post(
         "/post", 
@@ -46,7 +46,7 @@ async def test_create_post(async_client: AsyncClient,registered_user: dict, logg
     assert {
         "id": 1, 
         "body": body,
-        "user_id": registered_user["id"],
+        "user_id": confirmed_user["id"], 
     }.items() <= response.json().items()
 
 @pytest.mark.anyio
@@ -68,9 +68,9 @@ async def test_like_post(async_client: AsyncClient, craeted_post: dict, logged_i
     assert response.status_code == 201
 
 @pytest.mark.anyio
-async def test_create_post_expired_token(async_client: AsyncClient, registered_user: dict, mocker):
+async def test_create_post_expired_token(async_client: AsyncClient, confirmed_user: dict, mocker):
     mocker.patch("store.security.access_token_expire_minutes", return_value=-1)
-    token = security.create_access_token(registered_user["email"])
+    token = security.create_access_token(confirmed_user["email"])
     response = await async_client.post(
         "/post",
         json = {"body": "Test Post"},
@@ -119,7 +119,7 @@ async def test_get_all_posts_sort_likes(async_client: AsyncClient, logged_in_tok
 @pytest.mark.anyio
 async def test_get_all_posts_wrong_sorting(async_client: AsyncClient):
     response = await async_client.get("/post", params={"sorting": "wrong"})
-    assert response.status_code == 222
+    assert response.status_code == 422
 
 # @pytest.mark.anyio
 # async def test_get_all_post_sorting_old(async_client: AsyncClient, logged_in_token: str):
@@ -133,7 +133,7 @@ async def test_get_all_posts_wrong_sorting(async_client: AsyncClient):
 #     assert post_ids == expected_order
 
 @pytest.mark.anyio
-async def test_create_comment(async_client: AsyncClient, created_post: dict,registered_user: dict, logged_in_token: str):
+async def test_create_comment(async_client: AsyncClient, created_post: dict,confirmed_user: dict, logged_in_token: str):
     body = "test comment"
     response = await async_client.post(
         "/comment", 
@@ -145,7 +145,7 @@ async def test_create_comment(async_client: AsyncClient, created_post: dict,regi
         "id": 1,
         "body": body,
         "post_id": created_post["id"],
-        "user_id": registered_user["id"],
+        "user_id": confirmed_user["id"],
     }.items() <= response.json().items()
 
 @pytest.mark.anyio
@@ -172,4 +172,4 @@ async def test_get_post_with_comments(async_client: AsyncClient, created_post: d
 @pytest.mark.anyio
 async def test_get_missing_post_with_comments(async_client: AsyncClient):
     response = await async_client.get("/post/2")
-    assert response.status_code == 402
+    assert response.status_code == 404

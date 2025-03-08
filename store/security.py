@@ -107,4 +107,4 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     user = await get_user(email=email)
     if user is None:
         raise create_credentials_exception("Could not find user for this token")
-    return user
+    return user 

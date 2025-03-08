@@ -20,6 +20,50 @@ def test_create_confirmation_token():
         token, key=security.SECRET_KEY, algorithms=[security.ALGORITHM]
     ).items()
 
+def test_get_subject_for_token_type_valid_confirmation():
+    email = "test@example.net"
+    token = security.create_confirmation_token(email)
+    assert email == security.get_subject_for_token_type(token, "confirmation")
+
+def test_get_subject_for_token_type_valid_access():
+    email = "test@example.net"
+    token = security.create_confirmation_token(email)
+    assert email == security.get_subject_for_token_type(token, "access")
+
+def test_get_subject_for_token_type_expired(mocker):
+    mocker.patch("security.access_token_expire_minutes", return_value=-1)
+    email = "test@example.net"
+    token = security.create_access_token(email)
+    with pytest.raises(security.HTTPException) as exc_info:
+        security.get_subject_for_token_type(token, "access")
+    assert "Token has expired" == exc_info.value.detail
+
+def test_get_subject_for_invalid_token():
+    token = "Invalid token"
+    with pytest.raises(security.HTTPException) as exc_info:
+        security.get_subject_for_token_type(token, "access")
+    assert "Invalid token" == exc_info.value.detail
+
+def test_get_subject_for_token_type_missing_sub():
+    email = "test@example.com"
+    token = security.create_access_token(email)
+    payload = jwt.decode(
+        token, key=security.SECRET_KEY, algorithms=[security.ALGORITHM]
+    )
+    del payload["sub"]
+    token = jwt.encode(payload, key=security.SECRET_KEY, algorithm=security.ALGORITHM)
+
+    with pytest.raises(security.HTTPException) as exc_info:
+        security.get_subject_for_token_type(token, "access")
+    assert "Token is missing 'sub' field" == exc_info.value.detail
+
+def test_get_subject_for_token_type_wrong_type():
+    email = "test@example.com"
+    token = security.create_confirmation_token(email)
+    with pytest.raises(security.HTTPException) as exc_info:
+        security.get_subject_for_token_type(token, "access")
+    assert "Token has incorrect type, expected 'access'" == exc_info.value.detail
+
 def test_password_hashes():
     password = "password"
     assert security.verify_password(password, security.get_password_hash(password))
@@ -33,7 +77,7 @@ async def test_get_user(registered_user: dict):
 
 @pytest.mark.anyio
 async def test_get_user_not_found():
-    user = await security.get_user("test@gmail.com")
+    user = await security.get_user("moha@example.net")
     assert user is None
 
 @pytest.mark.anyio
